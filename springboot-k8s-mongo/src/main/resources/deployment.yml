@@ -1,0 +1,55 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-mongo-service
+spec:
+  selector:
+    app: spring-mongo-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    nodePort: 30081
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-mongo-service
+spec:
+  selector:
+      matchLabels:
+        app: spring-mongo-service
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: spring-mongo-service
+    spec:
+      containers:
+        - name: spring-mongo-service
+          image: spring-mongo-service:1.0
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 8080
+          env:
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: password
+            - name: MONGO_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-conf  
+                  key: database
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-conf 
+                  key: host
+                  
