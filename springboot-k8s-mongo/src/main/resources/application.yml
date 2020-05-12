@@ -10,8 +10,11 @@ spring:
       password: '${MONGO_PASSWORD}'
   cloud:
     kubernetes:
+      discovery:
+        register: true
       secrets:
         name: mongo-secret
+
       config:
         enabled: true
         sources:
